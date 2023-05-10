@@ -6,11 +6,13 @@ public class FootstepSoundPlayer : MonoBehaviour
     public AudioClip sidewalkFootstepSound;
     private AudioSource audioSource;
     private Vector3 lastPosition;
+    private string lastMaterialName;
 
     private void Start()
     {
         audioSource = GetComponent<AudioSource>();
         lastPosition = transform.position;
+        lastMaterialName = "";
     }
 
     private void Update()
@@ -21,22 +23,19 @@ public class FootstepSoundPlayer : MonoBehaviour
             if (Physics.Raycast(transform.position, Vector3.down, out hit))
             {
                 UnityEngine.Debug.Log(hit.collider.material.name); // Log the material name
-                switch (hit.collider.material.name)
+                if (lastMaterialName != hit.collider.material.name)
                 {
-                    case "Road (Instance)":
-                        if (audioSource.clip != roadFootstepSound)
-                        {
-                            audioSource.Stop();
+                    lastMaterialName = hit.collider.material.name;
+                    audioSource.Stop();
+                    switch (lastMaterialName)
+                    {
+                        case "Road (Instance)":
                             audioSource.clip = roadFootstepSound;
-                        }
-                        break;
-                    case "SideWalk (Instance)":
-                        if (audioSource.clip != sidewalkFootstepSound)
-                        {
-                            audioSource.Stop();
+                            break;
+                        case "SideWalk (Instance)":
                             audioSource.clip = sidewalkFootstepSound;
-                        }
-                        break;
+                            break;
+                    }
                 }
                 if (!audioSource.isPlaying) // Ensure the sound doesn't overlap
                 {
@@ -58,4 +57,3 @@ public class FootstepSoundPlayer : MonoBehaviour
         return Vector3.Distance(lastPosition, transform.position) > movementThreshold;
     }
 }
-
